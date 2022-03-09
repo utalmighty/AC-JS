@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-// Content of file: node cat.js -[option] [filepath]
+//Command Syntax: node cat.js -[option] [filepath]
 // OPTIONS
 //-r: read
 //-s: removes extra spaces
@@ -8,14 +8,13 @@ const fs = require("fs");
 //-b: enumerate except empty lines
 //-c: compress(huffman)
 //-d: decompress
-//-e: encrypt(playfair)
+//-e: encrypt(AES)
 //-de: decrypt
 //-touch: new file 
 
 let command = process.argv; // input from user
 // console.log(command);
 readCommand(command.splice(2));
-
 
 function readCommand(command){
     if(command[0] == "-r") {
