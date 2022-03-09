@@ -1,0 +1,9 @@
+Content of File 2. 
+
+def fooBar(a) :
+    String x = ""
+    if(a%3 == 0) :
+        x = "FOO"
+    if(a%5 == 0) :
+        x += "BAR"
+    print(x)
