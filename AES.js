@@ -305,6 +305,10 @@ function substituteSBox(hexa) {
     ]
     let i = hexaToDecTable[hexa.charAt(0).toLowerCase()];
     let j = hexaToDecTable[hexa.charAt(1).toLowerCase()];
+    if(hexa.length == 1) {
+        j = i;
+        i = 0;
+    }
     return sBox[i][j];
 }
 
@@ -378,10 +382,10 @@ let message = "Hello World Papa";
 let keyGrid = makeGrid(key);
 let messageGrid = makeGrid(message);
 
-console.log(keyGrid);
-console.log(messageGrid);
+// console.log(keyGrid);
+// console.log(messageGrid);
 
-for(let roundNumber=1; roundNumber<2; roundNumber++){ // 10 for 128bit encryption
+for(let roundNumber=1; roundNumber<11; roundNumber++){ // 10 for 128bit encryption
     lastWord = g(keyGrid, roundNumber);
 
     for(let i=0; i<4; i++){
@@ -398,11 +402,9 @@ for(let roundNumber=1; roundNumber<2; roundNumber++){ // 10 for 128bit encryptio
     for(let i=1;i<4;i++){
         rotate(messageGrid[i], i);
     }
-    console.log(messageGrid);
     //substitution
     for(let i=0; i<4; i++){
         for(let j=0;j<4;j++){
-            console.log(messageGrid[i][j].toString(16));
             messageGrid[i][j] = hexaToDecimal(substituteSBox(messageGrid[i][j].toString(16)));
         }
     }
@@ -420,19 +422,15 @@ for(let roundNumber=1; roundNumber<2; roundNumber++){ // 10 for 128bit encryptio
     }
 
 }
-console.log(messageGrid);
-
-
-
+//console.log(messageGrid);
 
 // display
-// k1 = ""
-// for(let i=0; i<4; i++){
-//     for(let j=0;j<4;j++){
-//         k1 += String.fromCharCode(keyGrid[j][i]);
-//     }
-// }
-// console.log(k1);
+encryptedMessage = ""
+for(let i=0; i<4; i++){
+    for(let j=0;j<4;j++){
+        encryptedMessage += String.fromCharCode(messageGrid[j][i]);
+    }
+}
+console.log(encryptedMessage);
 
-//
 
