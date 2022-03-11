@@ -378,18 +378,21 @@ function encrypt(message, key) {
     let messageGrid = makeGrid(message);
     let rounds = 10; // 128 bit Encryption
 
-    for(let roundNumber=1; roundNumber<=rounds; roundNumber++){
-        
-        // Rotation
-        shiftRows(messageGrid);
+    // Add Round Key
+    addRoundKey(messageGrid, key[0]);
 
+    for(let roundNumber=1; roundNumber<rounds; roundNumber++){
+        
         // Substitution
         for(let i=0; i<4; i++){
             for(let j=0;j<4;j++){
                 messageGrid[i][j] = hexaToDecimal(substituteSBox(messageGrid[i][j].toString(16)));
             }
         }
-        
+
+        // Rotation
+        shiftRows(messageGrid);
+
         // Mixing
         if(roundNumber != rounds){ // Skipping MixColumns for the last round.
             for(let i=0; i<4; i++){
@@ -406,8 +409,21 @@ function encrypt(message, key) {
         }
 
         // Add Round Key
-        addRoundKey(messageGrid, key[roundNumber-1]);
+        addRoundKey(messageGrid, key[roundNumber]);
     }
+
+    // Substitution
+    for(let i=0; i<4; i++){
+        for(let j=0;j<4;j++){
+            messageGrid[i][j] = hexaToDecimal(substituteSBox(messageGrid[i][j].toString(16)));
+        }
+    }
+    // Rotation
+    shiftRows(messageGrid);
+
+    // Add Round Key
+    addRoundKey(messageGrid, key[key.length-1]);
+
     return messageGrid;
 }
 
@@ -415,10 +431,21 @@ function decrypt(encryptedMessage, key) {
     let messageGrid = makeGrid(encryptedMessage);
     rounds = 10; // 10 for 128bit encryption
     
-    for(let roundNumber=1; roundNumber<=rounds; roundNumber++){ 
+    // Add Round Key
+    addRoundKey(messageGrid, key[key.length-1]);
+    // Rotation
+    invShiftRows(messageGrid);
+    // Substitution from Inv-S Box
+    for(let i=0; i<4; i++){
+        for(let j=0;j<4;j++){
+            messageGrid[i][j] = hexaToDecimal(substituteInvSBox(messageGrid[i][j].toString(16)));
+        }
+    }
+
+    for(let roundNumber=rounds-1; roundNumber>0; roundNumber--){ 
         
         // Add Round Key //In-reverse Order
-        addRoundKey(messageGrid, key[10-roundNumber]);
+        addRoundKey(messageGrid, key[roundNumber]);
 
         // Inverse Mixing
         if(roundNumber != rounds){ // Skipping MixColumns for the last round.
@@ -445,6 +472,10 @@ function decrypt(encryptedMessage, key) {
             }
         }
     }
+
+    // Add Round Key //In-reverse Order
+    addRoundKey(messageGrid, key[0]);
+
     return messageGrid;
 }
 
