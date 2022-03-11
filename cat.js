@@ -1,6 +1,7 @@
 const fs = require("fs");
+const AES = require('./AES.js')
 
-//Command Syntax: node cat.js -[option] [filepath]
+//Command Syntax: node cat.js -[option] [filepath] "[key]" //key is for encryption/decryption
 // OPTIONS
 //-s: removes extra spaces between lines
 //-n: enumerate
@@ -31,8 +32,23 @@ function readCommand(command){
         console.log("Filepath not found");
         return;
     }
-
+    //console.log(optionArray);
     options = optionsConflictResolver(optionArray);
+
+    if(options.includes("-e") || options.includes("-de")) {
+        if (filepaths.length > 2) {
+            console.log("Advanced Options can be applied on exactly one file at a time");
+            return;
+        }
+        if (filepaths.length < 2) {
+            console.log("Requires Filepath and key");
+            return;
+        }
+        if (fs.existsSync(filepaths[0])) encryDecry(options, filepaths[0], filepaths[1]);
+        else console.log(`File: ${filepaths[0]} does not exist.`);
+        return;
+    }
+
     for(let i=0; i<filepaths.length; i++){
         if (fs.existsSync(filepaths[i])) runCommands(options, filepaths[i])
         else console.log(`File: ${filepaths[i]} does not exist.`);
@@ -49,6 +65,15 @@ function optionsConflictResolver(optionArray) {
     // case -s with -b then both functions will run and output will look similar to only -b.
     if(optionArray.length == 0) {
         return ["-r"];
+    }
+
+    if(optionArray.includes("-e") || optionArray.includes("-de")) {
+        if (optionArray.length > 1) {
+            console.log("Invalid options: [Advanced Option should be used alone]");
+            return [];
+        }
+        if(optionArray.includes("-e")) return ["-e"];
+        if(optionArray.includes("-de")) return ["-de"];
     }
 
     options = [];
@@ -69,6 +94,10 @@ function optionsConflictResolver(optionArray) {
 
 function runCommands(options, file) {
     //TODO: add implementations of optionArray
+
+    if(options.length == 0){
+        return;
+    }
 
     if(options.length == 1) {
         switch (options[0]){
@@ -164,4 +193,36 @@ function enumerate(content, space=false) {
         number += 1;
     }
     return result;
+}
+
+function encryDecry(options, file, key) {
+    if(key.length != 16) {
+        console.log("Require 16 character key");
+        return;
+    }
+    let obj = new AES(key);
+    let filecontent = fs.readFileSync(file, "utf-8");
+    let finalmessage = "";
+    let indx = 0;
+    while(indx < filecontent.length){
+        let till = indx+16;
+        let temp = filecontent.substring(indx, till);
+        indx = till;
+        let text = null;
+        if(options[0] == "-e") {
+            text = obj.encrypt(temp);
+        }
+        else if(options[0] == "-de") {
+            text = obj.decrypt(temp);
+        }
+        //console.log(temp);
+        //console.log(text);
+        finalmessage += text;
+    }
+    //console.log(finalmessage);
+    last = finalmessage.length;
+    while(finalmessage.charCodeAt(last-1) == 0){
+        last--;
+    }
+    fs.writeFileSync(file, finalmessage.substring(0, last));
 }

@@ -303,7 +303,7 @@ function g(lastWord, round) {
 function getRoundKeys(keyGrid, rounds){
     let keyMatrix = [];
     
-    for(let roundNumber=1; roundNumber<=rounds; roundNumber++){ // 10
+    for(let roundNumber=1; roundNumber<=rounds; roundNumber++){
         
         lastWord = [];
         lastWord.length = 4;
@@ -374,9 +374,8 @@ function getText(messageGrid) {
     return text;
 }
 
-function encrypt(message, key) {
+function encrypt(message, key, rounds) {
     let messageGrid = makeGrid(message);
-    let rounds = 10; // 128 bit Encryption
 
     // Add Round Key
     addRoundKey(messageGrid, key[0]);
@@ -427,9 +426,8 @@ function encrypt(message, key) {
     return messageGrid;
 }
 
-function decrypt(encryptedMessage, key) {
+function decrypt(encryptedMessage, key, rounds) {
     let messageGrid = makeGrid(encryptedMessage);
-    rounds = 10; // 10 for 128bit encryption
     
     // Add Round Key
     addRoundKey(messageGrid, key[key.length-1]);
@@ -479,16 +477,24 @@ function decrypt(encryptedMessage, key) {
     return messageGrid;
 }
 
-let key = "abcdefghijklmnop"; //128 bit(16 chars * 8bit each)
-let message = "Hello World Papa";
+class AES {
+    constructor(key){
+        this.rounds = 10;
+        this.keyGrid = getRoundKeys(makeGrid(key), this.rounds);
+    }
 
-keys = getRoundKeys(makeGrid(key), 10);
-//console.log(keys);
+    encrypt(message) {
+        let grid = encrypt(message, this.keyGrid, this.rounds);
+        let text = getText(grid);
+        return text;
+    }
 
-grid = encrypt(message, keys);
-text = getText(grid);
-console.log("Encrypted:", text);
+    decrypt(message) {
+        let grid = decrypt(message, this.keyGrid, this.rounds)
+        let text = getText(grid);
+        return text;
+    }
 
-grid = decrypt(text, keys)
-text = getText(grid);
-console.log("Decrypted:", text);
+}
+
+module.exports = AES;
