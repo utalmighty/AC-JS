@@ -277,18 +277,12 @@ function substituteSBox(hexa) {
     return sBox[i][j];
 }
 
-function g(keyGrid, round) {
+function g(lastWord, round) {
     // Key Scheduling Function
     // Rotate Word
     // Substite byte
     // Add Round Constant
 
-    lastWord = [];
-    lastWord.length = 4;
-    for(let i=0;i<4;i++){
-        lastWord[i] = keyGrid[i][3];
-    }
-    //console.log("last", lastWord);
     rotate(lastWord, 1);
     //console.log("Rotated", lastWord);
     for(let i=0;i<4;i++){
@@ -304,6 +298,39 @@ function g(keyGrid, round) {
     //console.log("round Constant", lastWord);
     //console.log();
     return lastWord;
+}
+
+function getRoundKeys(keyGrid, rounds){
+    let keyMatrix = [];
+    
+    for(let roundNumber=1; roundNumber<=rounds; roundNumber++){ // 10
+        
+        lastWord = [];
+        lastWord.length = 4;
+        for(let i=0;i<4;i++){
+            lastWord[i] = keyGrid[i][3];
+        }
+
+        lastWord = g(lastWord, roundNumber);
+
+        for(let i=0; i<4; i++){
+            for(let j=0;j<4;j++){
+                keyGrid[j][i] = lastWord[j]^keyGrid[j][i];
+                lastWord[j] = keyGrid[j][i];
+            }
+        }
+
+        let tempKey = [] //Making copy of keyGrid to store in final array.
+        for(let i=0;i<4;i++){
+            let temp = []
+            for(let j=0;j<4;j++){
+                temp.push(keyGrid[i][j]);
+            }
+            tempKey.push(temp);
+        }  
+        keyMatrix.push(tempKey);
+    }
+    return keyMatrix;
 }
 
 function calcMixCols(column) {
@@ -348,26 +375,15 @@ function getText(messageGrid) {
 }
 
 function encrypt(message, key) {
-    let keyGrid = makeGrid(key);
     let messageGrid = makeGrid(message);
     let rounds = 10; // 128 bit Encryption
-    console.table(keyGrid);
-    console.table(messageGrid);
 
     for(let roundNumber=1; roundNumber<=rounds; roundNumber++){
-        lastWord = g(keyGrid, roundNumber);
-
-        for(let i=0; i<4; i++){
-            for(let j=0;j<4;j++){
-                keyGrid[j][i] = lastWord[j]^keyGrid[j][i];
-                lastWord[j] = keyGrid[j][i];
-            }
-        }
         
         // Rotation
         shiftRows(messageGrid);
 
-        //substitution
+        // Substitution
         for(let i=0; i<4; i++){
             for(let j=0;j<4;j++){
                 messageGrid[i][j] = hexaToDecimal(substituteSBox(messageGrid[i][j].toString(16)));
@@ -390,30 +406,19 @@ function encrypt(message, key) {
         }
 
         // Add Round Key
-        addRoundKey(messageGrid, keyGrid);
+        addRoundKey(messageGrid, key[roundNumber-1]);
     }
     return messageGrid;
 }
 
 function decrypt(encryptedMessage, key) {
-    let keyGrid = makeGrid(key);
     let messageGrid = makeGrid(encryptedMessage);
-    rounds = 10;
-    console.table(keyGrid);
-    console.table(messageGrid);
+    rounds = 10; // 10 for 128bit encryption
     
-    for(let roundNumber=1; roundNumber<=rounds; roundNumber++){ // 10 for 128bit encryption
-        lastWord = g(keyGrid, roundNumber);
-
-        for(let i=0; i<4; i++){
-            for(let j=0;j<4;j++){
-                keyGrid[j][i] = lastWord[j]^keyGrid[j][i];
-                lastWord[j] = keyGrid[j][i];
-            }
-        }
+    for(let roundNumber=1; roundNumber<=rounds; roundNumber++){ 
         
-        // Add Round Key
-        addRoundKey(messageGrid, keyGrid);
+        // Add Round Key //In-reverse Order
+        addRoundKey(messageGrid, key[10-roundNumber]);
 
         // Inverse Mixing
         if(roundNumber != rounds){ // Skipping MixColumns for the last round.
@@ -433,7 +438,7 @@ function decrypt(encryptedMessage, key) {
         // Rotation
         invShiftRows(messageGrid);
 
-        //substitution
+        // Substitution from Inv-S Box
         for(let i=0; i<4; i++){
             for(let j=0;j<4;j++){
                 messageGrid[i][j] = hexaToDecimal(substituteInvSBox(messageGrid[i][j].toString(16)));
@@ -446,10 +451,13 @@ function decrypt(encryptedMessage, key) {
 let key = "abcdefghijklmnop"; //128 bit(16 chars * 8bit each)
 let message = "Hello World Papa";
 
-grid = encrypt(message, key);
-text = getText(grid);
-console.log("Encrypted:",text);
+keys = getRoundKeys(makeGrid(key), 10);
+//console.log(keys);
 
-grid = decrypt(text, key)
+grid = encrypt(message, keys);
 text = getText(grid);
-console.log("Decrypted:",text);
+console.log("Encrypted:", text);
+
+grid = decrypt(text, keys)
+text = getText(grid);
+console.log("Decrypted:", text);
