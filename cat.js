@@ -1,7 +1,7 @@
 const fs = require("fs");
 const AES = require('./AES.js')
 
-//Command Syntax: node cat.js -[option] [filepath] "[key]" //key is for encryption/decryption
+//Command Syntax: node cat.js [option] [filepath] "[key]" //key is for encryption/decryption
 // OPTIONS
 //-s: removes extra spaces between lines
 //-n: enumerate
