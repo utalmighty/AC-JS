@@ -1,5 +1,6 @@
 // Advanced Encryption Algorithm
 
+//Essentails
 //Matrix Mul LookUp table https://en.wikipedia.org/wiki/Rijndael_MixColumns#Galois_Multiplication_lookup_tables
 mul2= 
 [
@@ -121,64 +122,6 @@ mul14=
 "d7","d9","cb","c5","ef","e1","f3","fd","a7","a9","bb","b5","9f","91","83","8d"
 ]
 
-//Essentials
-binToHexaTable = {
-    '0000' :"0",
-    '0001' :"1",
-    '0010' :"2",
-    '0011' :"3",
-    '0100' :"4",
-    '0101' :"5",
-    '0110' :"6",
-    '0111' :"7",
-    '1000' :"8",
-    '1001' :"9",
-    '1010' :"A",
-    '1011' :"B",
-    '1100' :"C",
-    '1101' :"D",
-    '1110' :"E",
-    '1111' :"F"
- }
- 
- hexaToBinTable = {
-     "0" :'0000' ,
-     "1" :'0001',
-     "2" :'0010',
-     "3" :'0011',
-     "4" :'0100',
-     "5" :'0101',
-     "6" :'0110',
-     "7" :'0111',
-     "8" :'1000',
-     "9" :'1001',
-     "A" :'1010',
-     "B" :'1011',
-     "C" :'1100',
-     "D" :'1101',
-     "E" :'1110',
-     "F" :'1111'
- }
-
-invSBox = [
-    ["52",	"09",	"6a",	"d5",	"30",	"36",	"a5",	"38",	"bf",	"40",	"a3",	"9e",	"81",	"f3",	"d7",	"fb"],
-    ["7c",	"e3",	"39",	"82",	"9b",	"2f",	"ff",	"87",	"34",	"8e",	"43",	"44",	"c4",	"de",	"e9",	"cb"],
-    ["54",	"7b",	"94",	"32",	"a6",	"c2",	"23",	"3d",	"ee",	"4c",	"95",	"0b",	"42",	"fa",	"c3",	"4e"],
-    ["08",	"2e",	"a1",	"66",	"28",	"d9",	"24",	"b2",	"76",	"5b",	"a2",	"49",	"6d",	"8b",	"d1",	"25"],
-    ["72",	"f8",	"f6",	"64",	"86",	"68",	"98",	"16",	"d4",	"a4",	"5c",	"cc",	"5d",	"65",	"b6",	"92"],
-    ["6c",	"70",	"48",	"50",	"fd",	"ed",	"b9",	"da",	"5e",	"15",	"46",	"57",	"a7",	"8d",	"9d",	"84"],
-    ["90",	"d8",	"ab",	"00",	"8c",	"bc",	"d3",	"0a",	"f7",	"e4",	"58",	"05",	"b8",	"b3",	"45",	"06"],
-    ["d0",	"2c",	"1e",	"8f",	"ca",	"3f",	"0f",	"02",	"c1",	"af",	"bd",	"03",	"01",	"13",	"8a",	"6b"],
-    ["3a",	"91",	"11",	"41",	"4f",	"67",	"dc",	"ea",	"97",	"f2",	"cf",	"ce",	"f0",	"b4",	"e6",	"73"],
-    ["96",	"ac",	"74",	"22",	"e7",	"ad",	"35",	"85",	"e2",	"f9",	"37",	"e8",	"1c",	"75",	"df",	"6e"],
-    ["47",	"f1",	"1a",	"71",	"1d",	"29",	"c5",	"89",	"6f",	"b7",	"62",	"0e",	"aa",	"18",	"be",	"1b"],
-    ["fc",	"56",	"3e",	"4b",	"c6",	"d2",	"79",	"20",	"9a",	"db",	"c0",	"fe",	"78",	"cd",	"5a",	"f4"],
-    ["1f",	"dd",	"a8",	"33",	"88",	"07",	"c7",	"31",	"b1",	"12",	"10",	"59",	"27",	"80",	"ec",	"5f"],
-    ["60",	"51",	"7f",	"a9",	"19",	"b5",	"4a",	"0d",	"2d",	"e5",	"7a",	"9f",	"93",	"c9",	"9c",	"ef"],
-    ["a0",	"e0",	"3b",	"4d",	"ae",	"2a",	"f5",	"b0",	"c8",	"eb",	"bb",	"3c",	"83",	"53",	"99",	"61"],
-    ["17",	"2b",	"04",	"7e",	"ba",	"77",	"d6",	"26",	"e1",	"69",	"14",	"63",	"55",	"21",	"0c",	"7d"]
-]
-
 hexaToDecTable = {
     "0" : 0,
     "1" : 1,
@@ -197,12 +140,10 @@ hexaToDecTable = {
     "e" : 14,
     "f" : 15
 } 
+
 // 10 rounds for 128-bit keys.
 // 12 rounds for 192-bit keys.
 // 14 rounds for 256-bit keys.
-
-//Plain text XOR key(1) -> subbytes-> shift rows -> Mix Columns-
-// ^___________________________________________________________|
 
 function reverse(a, i, j) {
     while(i<j) {
@@ -219,6 +160,12 @@ function rotate(arr, i) {
     reverse(arr, 0, 3-i);
     reverse(arr, (3-i)+1 ,3);
     
+}
+
+function invShiftRows(grid) {
+    rotate(grid[1], 3);
+    rotate(grid[2], 2);
+    rotate(grid[3], 1);
 }
 
 function shiftRows(grid) {
@@ -249,17 +196,6 @@ function makeGrid(a) {
     return grid;
 }
 
-function binaryToDecimal(binary) {
-    let dec = 0;
-    let powerValue = 1;
-    
-    for(let i=binary.length-1; i>=0; i--){
-        if(binary.charAt(i) == 1) dec += powerValue;
-        powerValue *= 2;
-    }
-    return dec;
-}
-
 function roundConstant(i){
     // TODO Inculde 13 round constant for 256 bit encryption
     const roundCon = ["01","02","04","08","10","20","40","80","1B","36"];
@@ -282,6 +218,35 @@ function hexaToDecimal(hexa) {
         powerValue *= 16;
     }
     return decimal;
+}
+
+function substituteInvSBox(hexa) {
+    invSBox = [
+        ["52",	"09",	"6a",	"d5",	"30",	"36",	"a5",	"38",	"bf",	"40",	"a3",	"9e",	"81",	"f3",	"d7",	"fb"],
+        ["7c",	"e3",	"39",	"82",	"9b",	"2f",	"ff",	"87",	"34",	"8e",	"43",	"44",	"c4",	"de",	"e9",	"cb"],
+        ["54",	"7b",	"94",	"32",	"a6",	"c2",	"23",	"3d",	"ee",	"4c",	"95",	"0b",	"42",	"fa",	"c3",	"4e"],
+        ["08",	"2e",	"a1",	"66",	"28",	"d9",	"24",	"b2",	"76",	"5b",	"a2",	"49",	"6d",	"8b",	"d1",	"25"],
+        ["72",	"f8",	"f6",	"64",	"86",	"68",	"98",	"16",	"d4",	"a4",	"5c",	"cc",	"5d",	"65",	"b6",	"92"],
+        ["6c",	"70",	"48",	"50",	"fd",	"ed",	"b9",	"da",	"5e",	"15",	"46",	"57",	"a7",	"8d",	"9d",	"84"],
+        ["90",	"d8",	"ab",	"00",	"8c",	"bc",	"d3",	"0a",	"f7",	"e4",	"58",	"05",	"b8",	"b3",	"45",	"06"],
+        ["d0",	"2c",	"1e",	"8f",	"ca",	"3f",	"0f",	"02",	"c1",	"af",	"bd",	"03",	"01",	"13",	"8a",	"6b"],
+        ["3a",	"91",	"11",	"41",	"4f",	"67",	"dc",	"ea",	"97",	"f2",	"cf",	"ce",	"f0",	"b4",	"e6",	"73"],
+        ["96",	"ac",	"74",	"22",	"e7",	"ad",	"35",	"85",	"e2",	"f9",	"37",	"e8",	"1c",	"75",	"df",	"6e"],
+        ["47",	"f1",	"1a",	"71",	"1d",	"29",	"c5",	"89",	"6f",	"b7",	"62",	"0e",	"aa",	"18",	"be",	"1b"],
+        ["fc",	"56",	"3e",	"4b",	"c6",	"d2",	"79",	"20",	"9a",	"db",	"c0",	"fe",	"78",	"cd",	"5a",	"f4"],
+        ["1f",	"dd",	"a8",	"33",	"88",	"07",	"c7",	"31",	"b1",	"12",	"10",	"59",	"27",	"80",	"ec",	"5f"],
+        ["60",	"51",	"7f",	"a9",	"19",	"b5",	"4a",	"0d",	"2d",	"e5",	"7a",	"9f",	"93",	"c9",	"9c",	"ef"],
+        ["a0",	"e0",	"3b",	"4d",	"ae",	"2a",	"f5",	"b0",	"c8",	"eb",	"bb",	"3c",	"83",	"53",	"99",	"61"],
+        ["17",	"2b",	"04",	"7e",	"ba",	"77",	"d6",	"26",	"e1",	"69",	"14",	"63",	"55",	"21",	"0c",	"7d"]
+    ]
+
+    let i = hexaToDecTable[hexa.charAt(0).toLowerCase()];
+    let j = hexaToDecTable[hexa.charAt(1).toLowerCase()];
+    if(hexa.length == 1) {
+        j = i;
+        i = 0;
+    }
+    return invSBox[i][j];
 }
 
 function substituteSBox(hexa) {
@@ -312,12 +277,8 @@ function substituteSBox(hexa) {
     return sBox[i][j];
 }
 
-function binaryToHexa(binary){
-    decimal = binaryToDecimal(binary);
-    return decimal.toString(16);
-}
-
 function g(keyGrid, round) {
+    // Key Scheduling Function
     // Rotate Word
     // Substite byte
     // Add Round Constant
@@ -341,6 +302,7 @@ function g(keyGrid, round) {
     // addRoundConstant
     lastWord[0] = lastWord[0] ^ hexaToDecimal(roundConstant(round));
     //console.log("round Constant", lastWord);
+    //console.log();
     return lastWord;
 }
 
@@ -375,62 +337,119 @@ function addRoundKey(messageGrid, keyGrid) {
     }
 }
 
+function getText(messageGrid) {
+    text = ""
+    for(let i=0; i<4; i++){
+        for(let j=0;j<4;j++){
+            text += String.fromCharCode(messageGrid[j][i]);
+        }
+    }
+    return text;
+}
 
-// ENCRYPTION:
+function encrypt(message, key) {
+    let keyGrid = makeGrid(key);
+    let messageGrid = makeGrid(message);
+    let rounds = 10; // 128 bit Encryption
+    console.table(keyGrid);
+    console.table(messageGrid);
+
+    for(let roundNumber=1; roundNumber<=rounds; roundNumber++){
+        lastWord = g(keyGrid, roundNumber);
+
+        for(let i=0; i<4; i++){
+            for(let j=0;j<4;j++){
+                keyGrid[j][i] = lastWord[j]^keyGrid[j][i];
+                lastWord[j] = keyGrid[j][i];
+            }
+        }
+        
+        // Rotation
+        shiftRows(messageGrid);
+
+        //substitution
+        for(let i=0; i<4; i++){
+            for(let j=0;j<4;j++){
+                messageGrid[i][j] = hexaToDecimal(substituteSBox(messageGrid[i][j].toString(16)));
+            }
+        }
+        
+        // Mixing
+        if(roundNumber != rounds){ // Skipping MixColumns for the last round.
+            for(let i=0; i<4; i++){
+                column = []
+                column.length = 4
+                for(let j=0;j<4;j++){
+                    column[j] = messageGrid[j][i];
+                }
+                calcMixCols(column);
+                for(let j=0;j<4;j++){
+                    messageGrid[j][i] = column[j];
+                }
+            }
+        }
+
+        // Add Round Key
+        addRoundKey(messageGrid, keyGrid);
+    }
+    return messageGrid;
+}
+
+function decrypt(encryptedMessage, key) {
+    let keyGrid = makeGrid(key);
+    let messageGrid = makeGrid(encryptedMessage);
+    rounds = 10;
+    console.table(keyGrid);
+    console.table(messageGrid);
+    
+    for(let roundNumber=1; roundNumber<=rounds; roundNumber++){ // 10 for 128bit encryption
+        lastWord = g(keyGrid, roundNumber);
+
+        for(let i=0; i<4; i++){
+            for(let j=0;j<4;j++){
+                keyGrid[j][i] = lastWord[j]^keyGrid[j][i];
+                lastWord[j] = keyGrid[j][i];
+            }
+        }
+        
+        // Add Round Key
+        addRoundKey(messageGrid, keyGrid);
+
+        // Inverse Mixing
+        if(roundNumber != rounds){ // Skipping MixColumns for the last round.
+            for(let i=0; i<4; i++){
+                column = []
+                column.length = 4
+                for(let j=0;j<4;j++){
+                    column[j] = messageGrid[j][i];
+                }
+                calcInvMixCols(column);
+                for(let j=0;j<4;j++){
+                    messageGrid[j][i] = column[j];
+                }
+            }
+        }
+
+        // Rotation
+        invShiftRows(messageGrid);
+
+        //substitution
+        for(let i=0; i<4; i++){
+            for(let j=0;j<4;j++){
+                messageGrid[i][j] = hexaToDecimal(substituteInvSBox(messageGrid[i][j].toString(16)));
+            }
+        }
+    }
+    return messageGrid;
+}
+
 let key = "abcdefghijklmnop"; //128 bit(16 chars * 8bit each)
 let message = "Hello World Papa";
-let keyGrid = makeGrid(key);
-let messageGrid = makeGrid(message);
 
-// console.log(keyGrid);
-// console.log(messageGrid);
+grid = encrypt(message, key);
+text = getText(grid);
+console.log("Encrypted:",text);
 
-for(let roundNumber=1; roundNumber<11; roundNumber++){ // 10 for 128bit encryption
-    lastWord = g(keyGrid, roundNumber);
-
-    for(let i=0; i<4; i++){
-        for(let j=0;j<4;j++){
-            keyGrid[j][i] = lastWord[j]^keyGrid[j][i];
-            lastWord[j] = keyGrid[j][i];
-        }
-    }
-    
-    // Add Round Key
-    addRoundKey(messageGrid, keyGrid);
-
-    // Rotation
-    for(let i=1;i<4;i++){
-        rotate(messageGrid[i], i);
-    }
-    //substitution
-    for(let i=0; i<4; i++){
-        for(let j=0;j<4;j++){
-            messageGrid[i][j] = hexaToDecimal(substituteSBox(messageGrid[i][j].toString(16)));
-        }
-    }
-    
-    for(let i=0; i<4; i++){
-        column = []
-        column.length = 4
-        for(let j=0;j<4;j++){
-            column[j] = messageGrid[j][i];
-        }
-        calcMixCols(column);
-        for(let j=0;j<4;j++){
-            messageGrid[j][i] = column[j];
-        }
-    }
-
-}
-//console.log(messageGrid);
-
-// display
-encryptedMessage = ""
-for(let i=0; i<4; i++){
-    for(let j=0;j<4;j++){
-        encryptedMessage += String.fromCharCode(messageGrid[j][i]);
-    }
-}
-console.log(encryptedMessage);
-
-
+grid = decrypt(text, key)
+text = getText(grid);
+console.log("Decrypted:",text);
