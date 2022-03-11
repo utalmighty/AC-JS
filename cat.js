@@ -1,4 +1,5 @@
 const fs = require("fs");
+var sha256 = require('js-sha256');
 const AES = require('./AES.js')
 
 //Command Syntax: node cat.js [option] [filepath] "[key]" //key is for encryption/decryption
@@ -201,9 +202,31 @@ function encryDecry(options, file, key) {
         return;
     }
     let obj = new AES(key);
+    let hash = sha256.sha256(key);
     let filecontent = fs.readFileSync(file, "utf-8");
-    let finalmessage = "";
     let indx = 0;
+
+    if(options[0] == "-de") {
+        let index = 0;
+        while(filecontent[index] != "\n" && index<filecontent.length) index++;
+        let keydigest = filecontent.substring(0, index+1);
+        //console.log( keydigest);
+        try{
+            const object = JSON.parse(keydigest);
+            if(object["keydigest"] != hash){
+                console("Key mismatch");
+                return;
+            }
+            indx = index+1;
+        }
+        catch(err){
+            console.log("Unable to authenticate the key");
+            return;
+        }
+    }
+
+    let finalmessage = "";
+    
     while(indx < filecontent.length){
         let till = indx+16;
         let temp = filecontent.substring(indx, till);
@@ -220,9 +243,16 @@ function encryDecry(options, file, key) {
         finalmessage += text;
     }
     //console.log(finalmessage);
+
+    if(options[0] == "-e") {
+        finalmessage = '{"keydigest":"'+hash+'"}\n'+finalmessage;
+    }
     last = finalmessage.length;
-    while(finalmessage.charCodeAt(last-1) == 0){
-        last--;
+    if(options[0] == "-de") {
+        
+        while(finalmessage.charCodeAt(last-1) == 0){
+            last--;
+        }
     }
     fs.writeFileSync(file, finalmessage.substring(0, last));
 }
