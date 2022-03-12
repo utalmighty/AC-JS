@@ -12,6 +12,10 @@ const AES = require('./AES.js')
 //-e: encrypt(AES-128)
 //-de: decrypt
 //-touch: new file
+//-help: command
+//-organize
+//-tree
+//
 // TODO: also include https://www.tecmint.com/13-basic-cat-command-examples-in-linux/
 
 
@@ -26,6 +30,20 @@ function readCommand(command){
     while (indx < command.length && command[indx][0] == "-") {
         optionArray.push(command[indx++]);
     }
+
+    //If options are valid or not
+    if(!validateOptions(optionArray)){
+        console.log("Invalid option USE node cat.js -help");
+        console.log("for help");
+        return;
+    }
+
+    //Help option
+    if(optionArray.includes("-help")){
+        help();
+        return;
+    }
+
     for(let i=indx; i<command.length; i++){
         filepaths.push(command[i]);
     }
@@ -33,10 +51,90 @@ function readCommand(command){
         console.log("Filepath not found");
         return;
     }
-    //console.log(optionArray);
+    
+    //Check if advance Options
+    conditionOrOptions  = isAdvance(optionArray);
+    if (typeof conditionOrOptions == "object"){
+        advanceCatCommands(conditionOrOptions, filepaths);
+        return;
+    }
+
     options = optionsConflictResolver(optionArray);
 
-    if(options.includes("-e") || options.includes("-de")) {
+    for(let i=0; i<filepaths.length; i++){
+        if (fs.existsSync(filepaths[i])) runCommands(options, filepaths[i]);
+        else console.log(`File: ${filepaths[i]} does not exist.`);
+    }
+}
+
+function validateOptions(options) {
+    const valids = ["-s", "-n", "-b", "-e", "-de", "-help", "-c", "-d", "-touch", "-organize", "-tree"];
+    for(let i=0; i<options.length; i++) {
+        if( !valids.includes(options[i]) ) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function help() {
+    console.log("Syntax:");
+    console.log("node cat.js [option] [File Path/Folder Path] [key]");
+    console.log("-s : Removes Extra spaces between lines and prints it.");
+    console.log("-n: Enumerates the content of files and print it.");
+    console.log("-b: Enumerates the content of files and print it.");
+    console.log("-n: Enumerates the non-empty of files and print it.");
+    console.log("-e: Encrypts the file with AES-128 bit and modifies the original file. Requires 16 character key");
+    console.log("-e: Decrypts the file and modifies the original file. Requires 16 character key (key authentication is also performed before decrypting)");
+    console.log("-help: Help");
+}
+
+function organize(folderpath) {
+    //organizes the files in the folder into different types of folder
+    const types = {
+        media: ["mp4", "mkv", "mp3"],
+        archives: ['zip', '7z', 'rar', 'tar', 'gz', 'ar', 'iso', "xz"],
+        documents: ['docx', 'doc', 'pdf', 'xlsx', 'xls', 'odt', 'ods', 'odp', 'odg', 'odf', 'txt', 'ps', 'tex'],
+        app: ['exe', 'dmg', 'pkg', "deb"],
+        images: ['png','jpg','jpeg']
+    }
+    
+    if(folderpath == undefined){
+        folderpath = process.cwd();
+        //Current working directory
+    }
+    let organisedFile = path.join(folderpath, "Organised Files");
+    if ( fs.existsSync(organisedFile) == false ){
+        fs.mkdirSync(organisedFile);
+    }
+    else {
+        console.log("Folder Already exist");
+        return;
+    }
+}
+
+function isAdvance(optionArray) {
+    if(optionArray.includes("-e") || optionArray.includes("-de") 
+    || optionArray.includes("-organize")) {
+        if (optionArray.length > 1) {
+            console.log("Invalid options: [Advanced Option should be used alone]");
+            return [];
+        }
+        if(optionArray.includes("-e")) return ["-e"];
+        if(optionArray.includes("-de")) return ["-de"];
+        if(optionArray.includes("-organize")) return ["-organize"];
+    }
+    return false;
+}
+
+function advanceCatCommands(options, filepaths) {
+    if (options.length == 0) return;
+
+    //Organise
+    else if(optionArray.includes("-organise")) organize();
+
+    // Encryption/Decryption
+    else if(options.includes("-e") || options.includes("-de")) { 
         if (filepaths.length > 2) {
             console.log("Advanced Options can be applied on exactly one file at a time");
             return;
@@ -48,12 +146,7 @@ function readCommand(command){
         if (fs.existsSync(filepaths[0])) encryDecry(options, filepaths[0], filepaths[1]);
         else console.log(`File: ${filepaths[0]} does not exist.`);
         return;
-    }
-
-    for(let i=0; i<filepaths.length; i++){
-        if (fs.existsSync(filepaths[i])) runCommands(options, filepaths[i])
-        else console.log(`File: ${filepaths[i]} does not exist.`);
-    }
+    };
 }
 
 function optionsConflictResolver(optionArray) {
@@ -66,15 +159,6 @@ function optionsConflictResolver(optionArray) {
     // case -s with -b then both functions will run and output will look similar to only -b.
     if(optionArray.length == 0) {
         return ["-r"];
-    }
-
-    if(optionArray.includes("-e") || optionArray.includes("-de")) {
-        if (optionArray.length > 1) {
-            console.log("Invalid options: [Advanced Option should be used alone]");
-            return [];
-        }
-        if(optionArray.includes("-e")) return ["-e"];
-        if(optionArray.includes("-de")) return ["-de"];
     }
 
     options = [];
@@ -97,32 +181,6 @@ function runCommands(options, file) {
     //TODO: add implementations of optionArray
 
     if(options.length == 0){
-        return;
-    }
-
-    if(options.length == 1) {
-        switch (options[0]){
-            case "-r":
-                printContentFromArray(getContent(file));
-                break;
-            case "-e":
-                console.log("Encryption: Coming Soon");
-                break;
-            case "-de":
-                console.log("Decryption: Coming Soon");
-                break;
-            case "-c":
-                console.log("Compression: Coming Soon");
-                break;
-            case "-r":
-                console.log("Decompression: Coming Soon");
-                break;
-            case "-touch" :
-                console.log("Decompression: Coming Soon");
-                break;
-            default :
-                console.log("Wrong Option");
-        }
         return;
     }
 
