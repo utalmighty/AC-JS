@@ -4,3 +4,5 @@ class DataNode {
         this.value = value
     }
 }
+
+module.exports = DataNode;

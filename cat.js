@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path"); //path module
 var sha256 = require('js-sha256');
 const AES = require('./AES.js')
 
@@ -43,18 +44,19 @@ function readCommand(command){
         help();
         return;
     }
-
+    // Reading filepaths
     for(let i=indx; i<command.length; i++){
         filepaths.push(command[i]);
     }
-    if(filepaths.length == 0) {
+    if(filepaths.length == 0 && !optionArray.includes("-organize")) {
         console.log("Filepath not found");
         return;
     }
     
-    //Check if advance Options
+    //Check for advance Options
     conditionOrOptions  = isAdvance(optionArray);
-    if (typeof conditionOrOptions == "object"){
+    if (typeof conditionOrOptions == "object"){ //Either Boolean or object 
+        // if optionArray contains advanced options then object is retured(array) else boolean(false) is returned.
         advanceCatCommands(conditionOrOptions, filepaths);
         return;
     }
@@ -91,26 +93,55 @@ function help() {
 
 function organize(folderpath) {
     //organizes the files in the folder into different types of folder
-    const types = {
-        media: ["mp4", "mkv", "mp3"],
-        archives: ['zip', '7z', 'rar', 'tar', 'gz', 'ar', 'iso', "xz"],
-        documents: ['docx', 'doc', 'pdf', 'xlsx', 'xls', 'odt', 'ods', 'odp', 'odg', 'odf', 'txt', 'ps', 'tex'],
-        app: ['exe', 'dmg', 'pkg', "deb"],
-        images: ['png','jpg','jpeg']
-    }
     
     if(folderpath == undefined){
         folderpath = process.cwd();
         //Current working directory
     }
-    let organisedFile = path.join(folderpath, "Organised Files");
+    let organisedFile = path.join(folderpath, "Organised_Files");
     if ( fs.existsSync(organisedFile) == false ){
         fs.mkdirSync(organisedFile);
+        let allFiles = fs.readdirSync(folderpath);
+        for (let i = 0; i < allFiles.length; i++){
+            let fullPathOfFile = path.join(folderpath, allFiles[i]);
+            let isFile = fs.lstatSync(fullPathOfFile).isFile();
+            if (isFile) {
+                let ext = path.extname(allFiles[i]).split(".")[1];
+                let destFolderName = getFolderName(ext);
+                if (destFolderName != null)
+                    moveToDestinationFolder(folderpath, allFiles[i], organisedFile, destFolderName);
+            }
+        }
     }
     else {
         console.log("Folder Already exist");
         return;
     }
+}
+
+function moveToDestinationFolder(from, file, organisedFolder, destFolder) {
+    let destPath = path.join(organisedFolder, destFolder);
+    if(!fs.existsSync(destPath)) {
+        fs.mkdirSync(destPath);
+    }
+    let srcFile = path.join(from, file);
+    let destFile = path.join(destPath, file);
+    fs.rename(srcFile, destFile, function (err) { if (err) throw err }); // Moving File
+}
+
+function getFolderName(extension) {
+    // Return Folder name accrding to the file type else returns null
+    const types = {
+        Media: ["mp4", "mkv", "mp3"],
+        Archives: ['zip', '7z', 'rar', 'tar', 'gz', 'ar', 'iso', "xz"],
+        Documents: ['docx', 'doc', 'pdf', 'xlsx', 'xls', 'odt', 'ods', 'odp', 'odg', 'odf', 'txt', 'ps', 'tex'],
+        App: ['exe', 'dmg', 'pkg', "deb", "apk"],
+        Images: ['png','jpg','jpeg']
+    }
+    for (t in types) {
+        if (types[t].includes(extension)) return t;
+    }
+    return null;
 }
 
 function isAdvance(optionArray) {
@@ -120,9 +151,10 @@ function isAdvance(optionArray) {
             console.log("Invalid options: [Advanced Option should be used alone]");
             return [];
         }
+        // Change to switch
         if(optionArray.includes("-e")) return ["-e"];
-        if(optionArray.includes("-de")) return ["-de"];
-        if(optionArray.includes("-organize")) return ["-organize"];
+        else if(optionArray.includes("-de")) return ["-de"];
+        else if(optionArray.includes("-organize")) return ["-organize"];
     }
     return false;
 }
@@ -131,7 +163,13 @@ function advanceCatCommands(options, filepaths) {
     if (options.length == 0) return;
 
     //Organise
-    else if(optionArray.includes("-organise")) organize();
+    else if(optionArray.includes("-organize")) {
+        if (filepaths.length > 1) {
+            console.log("[organize] Atmost one path is permitted");
+            return;
+        }
+        organize(filepaths[0]);
+    }
 
     // Encryption/Decryption
     else if(options.includes("-e") || options.includes("-de")) { 
