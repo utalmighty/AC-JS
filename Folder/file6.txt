@@ -1,3 +1,1 @@
-,,,,,,,,a,i,g,d,h,b,c,,,,,,,,,,,,,,,,f,e,,,,
-00001
-23 63 229
+abcdefghijklmnopqrstuvwxyz

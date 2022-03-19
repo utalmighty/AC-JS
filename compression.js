@@ -1,6 +1,7 @@
-const { Blob } = require("buffer");
 const fs = require("fs");
 const MinHeap = require('./MinHeap.js')
+
+//TODO: multiple line unsuppored right now/support it
 
 class TreeNode {
     constructor(left, right, data) {
@@ -69,9 +70,52 @@ function decimalToBinary(decimal) {
     return binary.reverse().join("");
 }
 
+function getActualData(data, tree) {
+    //console.log("Binary Data:", data, "Tree:", tree);
+    let actualData = [];
+    let indx = 0;
+    let pointer = 1;
+    
+    while(indx < data.length) {
+        if (data[indx] == 0) { // Go left of tree
+            pointer = leftChild(pointer);
+            if(tree[pointer].length == 1) {
+                actualData.push(tree[pointer]);
+                pointer = 1;
+            }
+        }
+        else if (data[indx] == 1) { // Go right
+            pointer = rightChild(pointer);
+            if(tree[pointer].length == 1) {
+                actualData.push(tree[pointer]);
+                pointer = 1;
+            }
+        }
+        indx++;
+    }
+    //console.log("Actual Data:", actualData.join(""));
+    return actualData.join("");
+}
+
+function store(foo, file) {
+    var bytes = foo.split(" ");
+
+    var b = Buffer.alloc(bytes.length);
+    // console.log(bytes.length);
+    for (var i = 0; i < bytes.length;i++) {
+        b[i] = bytes[i];
+    }
+
+    fs.writeFileSync(file, b, "binary");
+}
+
 function compress(file) {
     let heap = new MinHeap();
     const content = fs.readFileSync(file, "utf-8");
+    if (content.split("\n")[0] == "{compress:true}") {
+        console.log("Already compressed");
+        return;
+    }
     const map = getProbabiltyArray(content);
     const iterator1 = map.keys();
     let alphaLen = map.size;
@@ -149,7 +193,7 @@ function compress(file) {
     }
 
     dfsFunction( 1 );
-    console.log(binary);
+    //console.log(binary);
 
     // Constructin final Integer array to store in file
     let final = [];
@@ -158,63 +202,52 @@ function compress(file) {
         final.push(binary[char]);
     }
     let binaryString = final.join("");
-    
+    //getActualData(binaryString, queue.join(",").split(","));
     let indx = 0;
     decimalArray = [];
     let length = binaryString.length;
     let extra = length%8;
     let extraBits = binaryString.substring(length-extra); // contains extra bits
+    //console.log("Binary String Length:"+ length, "Extra: "+extra);
 
     while (indx < length-extra) {
         decimalArray.push(binaryToDecimal( binaryString.substring(indx, indx+8) ));
         indx+=8;
     }
-    //console.log(queue, extraBits,decimalArray);
-    let compressedData = queue+"\n"+extraBits+"\n"+decimalArray.join(" ");
-    fs.writeFileSync(file, compressedData);
-
+    let metaData = "{compress:true}"+"\n"+queue.join(",")+"\n"+extraBits;
+    metaDataFileWrite(metaData, "Folder/compress.txt");
+    store(decimalArray.join(" "), file);
 }
 
-function getActualData(data, tree) {
-    let actualData = [];
-    let indx = 0;
-    let pointer = 1;
-    
-    while(indx < data.length) {
-        if (data[indx] == 0) { // Go left of tree
-            pointer = leftChild(pointer);
-            if(tree[pointer].length == 1) {
-                actualData.push(tree[pointer]);
-                pointer = 1;
-            }
-        }
-        else if (data[indx] == 1) { // Go right
-            pointer = rightChild(pointer);
-            if(tree[pointer].length == 1) {
-                actualData.push(tree[pointer]);
-                pointer = 1;
-            }
-        }
-        indx++;
-    }
+function metaDataFileWrite(data, fileName){
+    fs.writeFileSync(fileName, data);
+}
 
-    console.log(actualData.join(""));
+function readBuffer(file) {
+    let bfr = fs.readFileSync(file);
+    let content = [];
+    for(let i=0;i<bfr.length; i++){
+        //console.log(bfr[i]);
+        content.push(String.fromCharCode(bfr[i]));
+    }
+    return content.join("");
+}
+
+function decompress(file) {
+    let metaDataFile = "Folder/compress.txt";
+    const metaData = fs.readFileSync(metaDataFile, "utf-8");
+    let phases = metaData.split("\n");
+    let tree = phases[1].split(",");
+    let extraBits = phases[2];
+    let data = readBuffer(file);
+    let binaryData = [];
+    for (let i=0; i<data.length; i++) {
+        binaryData.push(decimalToBinary(data.charCodeAt(i)));
+    }
+    //getActualData(binaryData.join("")+extraBits, tree);
+    fs.writeFileSync(file, getActualData(binaryData.join("")+extraBits, tree));
 }
 
 file  = "Folder/file6.txt";
 compress(file);
 decompress(file);
-
-function decompress(file) {
-    const content = fs.readFileSync(file, "utf-8");
-    let phases = content.split("\n");
-    let tree = phases[0].split(",");
-    let extraBits = phases[1];
-    let data = phases[2].split(" ");
-    let binaryData = [];
-    for (let i=0; i<data.length; i++) {
-        console.log(data[i]);
-        binaryData.push(decimalToBinary(parseInt(data[i])));
-    }
-    getActualData(binaryData.join(""), tree);
-}
