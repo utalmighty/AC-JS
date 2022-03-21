@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const MinHeap = require('./MinHeap.js')
 
 //TODO: multiple line unsuppored right now/support it
@@ -97,8 +98,8 @@ function getActualData(data, tree) {
     return actualData.join("");
 }
 
-function store(foo, file) {
-    var bytes = foo.split(" ");
+function store(data, file, metaData) {
+    var bytes = data.split(" ");
 
     var b = Buffer.alloc(bytes.length);
     // console.log(bytes.length);
@@ -106,7 +107,25 @@ function store(foo, file) {
         b[i] = bytes[i];
     }
 
-    fs.writeFileSync(file, b, "binary");
+    //fs.writeFileSync(file, b, "binary");
+
+    fullPath = file.split("/");
+    filenameWithExt = fullPath[fullPath.length-1].split("."); // List form
+    fullFileName = fullPath[fullPath.length-1];
+    filePath = fullPath.splice(0, fullPath.length-1).join("/");
+    filename = filenameWithExt.splice(0, filenameWithExt.length-1).join(".");
+
+    FolderName = filename.substring(0, 1).toUpperCase()+filename.substring(1, filename.length)+"_compressed";
+    folderPath = path.join(filePath, FolderName);
+    if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath);
+    }
+
+    metaFileName = filename+"(meta).txt";
+    metaFilePath = path.join(folderPath, metaFileName);
+    fs.writeFileSync(metaFilePath, metaData); // Storing Meta data
+    finalFilePath = path.join(folderPath, fullFileName);
+    fs.writeFileSync(finalFilePath, b, "binary" )
 }
 
 function compress(file) {
@@ -215,12 +234,7 @@ function compress(file) {
         indx+=8;
     }
     let metaData = "{compress:true}"+"\n"+queue.join(",")+"\n"+extraBits;
-    metaDataFileWrite(metaData, "Folder/compress.txt");
-    store(decimalArray.join(" "), file);
-}
-
-function metaDataFileWrite(data, fileName){
-    fs.writeFileSync(fileName, data);
+    store(decimalArray.join(" "), file, metaData);
 }
 
 function readBuffer(file) {
@@ -234,7 +248,8 @@ function readBuffer(file) {
 }
 
 function decompress(file) {
-    let metaDataFile = "Folder/compress.txt";
+    
+    let metaDataFile = "Folder/File6_compressed/file6(meta).txt";
     const metaData = fs.readFileSync(metaDataFile, "utf-8");
     let phases = metaData.split("\n");
     let tree = phases[1].split(",");
@@ -249,5 +264,6 @@ function decompress(file) {
 }
 
 file  = "Folder/file6.txt";
+dec = "Folder/File6_compressed/file6.txt"
 compress(file);
-decompress(file);
+decompress(dec);
