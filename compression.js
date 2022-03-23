@@ -157,32 +157,35 @@ function compress(file) {
             break;
         }
         let rightnode = heap.getMinimum();
+        //console.log(">>", leftnode, rightnode);
         let node = new TreeNode(leftnode, rightnode, null);
         
         heap.addNode( node, leftnode.value+rightnode.value );
     }
-
     //TODO: for single character document replace single character by 0's.
     //DataNode.data => treeNode/alphabet 
 
     // Denoting tree in 2D array.
     let queue = [0, root.data];
     let queuePointer = 1;
-
-    do { // BFS
-        let object = queue[queuePointer++];
-        //console.log(object, typeof object);
+    counter = 0;
+    while (counter < alphaLen) { // BFS
+        let object = queue[queuePointer];
+        queuePointer += 1;
         if (object == null) {
+            queue.push(null);
+            queue.push(null);
             continue;
         }
         if (typeof object == "string"){
+            counter += 1;
             queue.push(null);
             queue.push(null);
             continue;
         } 
         queue.push(object.left.data);
         queue.push(object.right.data);
-    }while(queuePointer!=queue.length)
+    }
 
     for(let i=0; i<queue.length; i++) {
         if (typeof queue[i] != "string") queue[i] =  null;
@@ -221,7 +224,7 @@ function compress(file) {
         final.push(binary[char]);
     }
     let binaryString = final.join("");
-    //getActualData(binaryString, queue.join(",").split(","));
+    getActualData(binaryString, queue.join(",").split(","));
     let indx = 0;
     decimalArray = [];
     let length = binaryString.length;
@@ -259,11 +262,10 @@ function decompress(file) {
     for (let i=0; i<data.length; i++) {
         binaryData.push(decimalToBinary(data.charCodeAt(i)));
     }
-    //getActualData(binaryData.join("")+extraBits, tree);
     fs.writeFileSync(file, getActualData(binaryData.join("")+extraBits, tree));
 }
 
 file  = "Folder/file6.txt";
 dec = "Folder/File6_compressed/file6.txt"
-compress(file);
+//compress(file);
 decompress(dec);
