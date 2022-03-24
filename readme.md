@@ -1,7 +1,7 @@
 # Advance CAT commands
 
 ## General Syntax:
-`node cat.js [options] [filepaths] [key]`
+`node cat [options] [filepaths] [key]`
 
 option to remove big line break (`-s`)<br>
 option to add line number to non empty lines (`-b`)<br>
@@ -10,14 +10,18 @@ option to encrypt the file (`-e`) (AES-128 bit)<br>
 option to encrypt the file (`-de`) (AES-128 bit)<br>
 
 ## Commands:
-1- `node cat.js filepath` => displays content of the file in the terminal 🗄<br>
-2- `node cat.js filepath1 filepath2 filepath3...` => displays content of all files in the terminal in (contactinated form) in the given order. 🗃<br>
-3- `node cat.js -s filepath` => convert big line breaks into a singular line break 📜<br>
-4- `node cat.js -n filepath` => give numbering to all the lines 🔢<br>
-5- `node cat.js -b filepath` => give numbering to non-empty lines 📜🔢<br>
-6- `node cat.js -e filepath key` => encrypt file with Military Grade(AES-128) bit encryption 🔒<br>
-7- `node cat.js -de filepath key` => decrypt file with Military Grade(AES-128) bit encryption 🔓<br>
-8- We can mix and match the options.
+1- `node cat filepath` => displays content of the file in the terminal 🗄<br>
+2- `node cat filepath1 filepath2 filepath3...` => displays content of all files in the terminal in (contactinated form) in the given order. 🗃<br>
+3- `node cat -s filepath` => convert big line breaks into a singular line break 📜<br>
+4- `node cat -n filepath` => give numbering to all the lines 🔢<br>
+5- `node cat -b filepath` => give numbering to non-empty lines 📜🔢<br>
+6- `node cat -e filepath key` => encrypt file with Military Grade(AES-128) bit encryption 🔒<br>
+7- `node cat -de filepath key` => decrypt file with Military Grade(AES-128) bit encryption 🔓<br>
+8- `node cat -c filepath` => Compresses the text based file using Huffman Coding 🗜<br>
+9- `node cat -d filepath` => decompresses file compressed file 🗄<br>
+10- `node cat -touch filepath` => Creates new file/folder at the specified path 🆕<br>
+11- `node cat -tree filepath` => Draws the path tree 🌳<br>
+12- We can mix and match some of the options.
 
 ## Edge cases:
 
@@ -26,3 +30,7 @@ option to encrypt the file (`-de`) (AES-128 bit)<br>
 3- `-s` and any or both `-n` and `-b` present then `-s` will be executed first and then `-n` and `-b` according second rule.<br>
 4- Advanced options like encryption/decryption can not be mixed matched.<br>
 5- For Encryption and decryption 16 character (128 bit) key is required.
+6- Compression is done using Huffman coding.
+7- Can only decompress file which is compressed using this software only.
+8- Touch command can create new folder or files.
+9- filepath in tree command is optional.
