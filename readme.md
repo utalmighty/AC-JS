@@ -29,8 +29,8 @@ option to encrypt the file (`-de`) (AES-128 bit)<br>
 2- `-n` and `-b` are 2 options which are mutually exclusive so if user types both of them together only the first enter option should work.<br>
 3- `-s` and any or both `-n` and `-b` present then `-s` will be executed first and then `-n` and `-b` according second rule.<br>
 4- Advanced options like encryption/decryption can not be mixed matched.<br>
-5- For Encryption and decryption 16 character (128 bit) key is required.
-6- Compression is done using Huffman coding.
-7- Can only decompress file which is compressed using this software only.
-8- Touch command can create new folder or files.
-9- filepath in tree command is optional.
+5- For Encryption and decryption 16 character (128 bit) key is required.<br>
+6- Compression is done using Huffman coding.<br>
+7- Can only decompress file which is compressed using this software only.<br>
+8- Touch command can create new folder or files.<br>
+9- filepath in tree command is optional.<br>
