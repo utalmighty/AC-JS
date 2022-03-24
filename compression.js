@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const MinHeap = require('./MinHeap.js')
+const MinHeap = require('./MinHeap.js');
 
 //TODO: multiple line unsuppored right now/support it
 
@@ -107,15 +107,14 @@ function store(data, file, metaData) {
         b[i] = bytes[i];
     }
 
-    //fs.writeFileSync(file, b, "binary");
-
     fullPath = file.split("/");
     filenameWithExt = fullPath[fullPath.length-1].split("."); // List form
+    extension = filenameWithExt[filenameWithExt.length-1];
     fullFileName = fullPath[fullPath.length-1];
     filePath = fullPath.splice(0, fullPath.length-1).join("/");
     filename = filenameWithExt.splice(0, filenameWithExt.length-1).join(".");
 
-    FolderName = filename.substring(0, 1).toUpperCase()+filename.substring(1, filename.length)+"_compressed";
+    FolderName = filename+"_"+extension+"_compressed";
     folderPath = path.join(filePath, FolderName);
     if (!fs.existsSync(folderPath)) {
         fs.mkdirSync(folderPath);
@@ -250,9 +249,23 @@ function readBuffer(file) {
     return content.join("");
 }
 
-function decompress(file) {
-    
-    let metaDataFile = "Folder/File6_compressed/file6(meta).txt";
+function getFileName(folder) {
+    // Returns the file name, file path, meta file path.
+    fullPath = folder.split("/");
+    folderName = fullPath[fullPath.length-1];
+    fileNameAndExtensionArray = folderName.split("_");
+    filename = fileNameAndExtensionArray.splice(0, fileNameAndExtensionArray.length-2).join("_");
+    fileExtension = fileNameAndExtensionArray[0];
+    fullFileName = filename+"."+fileExtension;
+    filePath = path.join(folder, fullFileName);
+    metaFilePath = path.join(folder, filename+"(meta)."+fileExtension);
+    return [fullFileName, filePath, metaFilePath]; 
+}
+
+function decompress(folder) {
+    let fileInArray = getFileName(folder);
+    let file = fileInArray[1];
+    let metaDataFile = fileInArray[2];
     const metaData = fs.readFileSync(metaDataFile, "utf-8");
     let phases = metaData.split("\n");
     let tree = phases[1].split(",");
@@ -262,10 +275,10 @@ function decompress(file) {
     for (let i=0; i<data.length; i++) {
         binaryData.push(decimalToBinary(data.charCodeAt(i)));
     }
-    fs.writeFileSync(file, getActualData(binaryData.join("")+extraBits, tree));
+    fs.writeFileSync(fileInArray[0], getActualData(binaryData.join("")+extraBits, tree));
+
 }
 
-file  = "Folder/file6.txt";
-dec = "Folder/File6_compressed/file6.txt"
-//compress(file);
-decompress(dec);
+module.exports = {
+    compress, decompress
+}

@@ -1,20 +1,21 @@
 const fs = require("fs");
 const path = require("path"); //path module
 var sha256 = require('js-sha256');
-const AES = require('./AES.js')
+const AES = require('./AES.js');
+let compression = require("./compression");
 
 //Command Syntax: node cat.js [option] [filepath] "[key]" //key is for encryption/decryption
 // OPTIONS
-//-s: removes extra spaces between lines
-//-n: enumerate
-//-b: enumerate except empty lines
-//-c: compress(huffman)
-//-d: decompress
-//-e: encrypt(AES-128)
-//-de: decrypt
-//-touch: new file
-//-help: command
-//-organize
+//-s: removes extra spaces between lines ✔
+//-n: enumerate ✔
+//-b: enumerate except empty lines ✔
+//-c: compress(huffman) ✔
+//-d: decompress ✔
+//-e: encrypt(AES-128) ✔
+//-de: decrypt ✔
+//-touch: new file or folder ✔
+//-help: command ✔
+//-organize ✔
 //-tree
 //
 // TODO: also include https://www.tecmint.com/13-basic-cat-command-examples-in-linux/
@@ -44,11 +45,13 @@ function readCommand(command){
         help();
         return;
     }
+    
     // Reading filepaths
     for(let i=indx; i<command.length; i++){
         filepaths.push(command[i]);
     }
-    if(filepaths.length == 0 && !optionArray.includes("-organize")) {
+
+    if(filepaths.length == 0 && !optionArray.includes("-organize") && !optionArray.includes("-tree")) {
         console.log("Filepath not found");
         return;
     }
@@ -81,13 +84,16 @@ function validateOptions(options) {
 
 function help() {
     console.log("Syntax:");
-    console.log("node cat.js [option] [File Path/Folder Path] [key]");
+    console.log("node cat.js [option(s)] [File Path/Folder Path] [key]");
     console.log("-s : Removes Extra spaces between lines and prints it.");
     console.log("-n: Enumerates the content of files and print it.");
     console.log("-b: Enumerates the content of files and print it.");
     console.log("-n: Enumerates the non-empty of files and print it.");
     console.log("-e: Encrypts the file with AES-128 bit and modifies the original file. Requires 16 character key");
     console.log("-e: Decrypts the file and modifies the original file. Requires 16 character key (key authentication is also performed before decrypting)");
+    console.log("-c: Compresses the text based file using Huffman coding.");
+    console.log("-d: Decompresses the compressed file.");
+    console.log("-touch: Used to create a file/folder at the specified path");
     console.log("-help: Help");
 }
 
@@ -146,7 +152,9 @@ function getFolderName(extension) {
 
 function isAdvance(optionArray) {
     if(optionArray.includes("-e") || optionArray.includes("-de") 
-    || optionArray.includes("-organize")) {
+    || optionArray.includes("-organize") || optionArray.includes("-c") 
+    || optionArray.includes("-d") || optionArray.includes("-touch")
+    || optionArray.includes("-tree")) {
         if (optionArray.length > 1) {
             console.log("Invalid options: [Advanced Option should be used alone]");
             return [];
@@ -155,6 +163,10 @@ function isAdvance(optionArray) {
         if(optionArray.includes("-e")) return ["-e"];
         else if(optionArray.includes("-de")) return ["-de"];
         else if(optionArray.includes("-organize")) return ["-organize"];
+        else if(optionArray.includes("-c")) return ["-c"];
+        else if(optionArray.includes("-d")) return ["-d"];
+        else if(optionArray.includes("-touch")) return ["-touch"];
+        else if(optionArray.includes("-tree")) return ["-tree"];
     }
     return false;
 }
@@ -163,7 +175,7 @@ function advanceCatCommands(options, filepaths) {
     if (options.length == 0) return;
 
     //Organise
-    else if(optionArray.includes("-organize")) {
+    else if(options.includes("-organize")) {
         if (filepaths.length > 1) {
             console.log("[organize] Atmost one path is permitted");
             return;
@@ -184,7 +196,29 @@ function advanceCatCommands(options, filepaths) {
         if (fs.existsSync(filepaths[0])) encryDecry(options, filepaths[0], filepaths[1]);
         else console.log(`File: ${filepaths[0]} does not exist.`);
         return;
-    };
+    }
+
+    // Compression/Decompression
+    else if (options.includes("-c") || options.includes("-d")){
+        if (filepaths.length != 1) {
+            console.log("Compression/Decompression requires path");
+            return;
+        }
+        compressDecompress(options, filepaths[0]);
+    }
+    
+    // Touch
+    else if (options.includes("-touch")) {
+        touch(filepaths[0]);
+    }
+
+    // Tree
+    else if (options.includes("-tree")) {
+        if(filepaths[0] == undefined){
+            filepaths[0] = process.cwd();
+        }
+        tree(filepaths[0], "");
+    }
 }
 
 function optionsConflictResolver(optionArray) {
@@ -351,4 +385,80 @@ function encryDecry(options, file, key) {
         }
     }
     fs.writeFileSync(file, finalmessage.substring(0, last));
+}
+
+function decompressFolderBriefValidation(folder) {
+    let isFile = fs.lstatSync(folder).isFile();
+    if (!isFile){
+        check = folder.split("_");
+        if (check[check.length-1] == "compressed"){
+            fullPath = folder.split("/");
+            folderName = fullPath[fullPath.length-1];
+            fileNameAndExtensionArray = folderName.split("_");
+            filename = fileNameAndExtensionArray.splice(0, fileNameAndExtensionArray.length-2).join("_");
+            fileExtension = fileNameAndExtensionArray[0];
+            fullFileName = filename+"."+fileExtension;
+            filePath = path.join(folder, fullFileName);
+            metaFilePath = path.join(folder, filename+"(meta)."+fileExtension);
+            if (fs.existsSync(filePath) && fs.existsSync(metaFilePath)) return true;
+        }
+    }
+    return false;
+}
+
+function compressDecompress(option, path) {
+    if (fs.existsSync(path)){
+        if (option == "-c") {
+            let isFile = fs.lstatSync(path).isFile();
+            if (isFile) {
+                compression.compress(path)
+            }
+            else {
+                console.log("Unable to compress given path");
+            }
+        }
+        else if (option == "-d") {
+            if (decompressFolderBriefValidation(path)) {
+                compression.decompress(path);//check for valid file
+            }
+            else {
+                console.log("Unable to decompress given path");
+            }
+        }
+    }
+    else {
+        console.log("Unable to locate the file");
+    }
+}
+
+function touch(filePath) {
+    if(path.basename(filePath).split(".").length >= 2){
+        let directory = path.dirname(filePath);
+        if(!fs.existsSync(directory)) {
+            fs.mkdirSync(directory);
+        }
+        if(path.basename(filePath).length != 0){
+            fs.writeFileSync(filePath, "");
+        }
+    }
+    else {
+        fs.mkdirSync(filePath);
+    }
+}
+
+function tree(folder, prefix) {
+    let content =  fs.readdirSync(folder);
+
+    for(let i=0; i<content.length; i++) {
+        let temp = path.join(folder, content[i]);
+        if (i == content.length-1) { //if last directory of the folder
+            console.log(prefix + "└───" + content[i]);
+            if(fs.lstatSync(temp).isDirectory()) tree(temp, prefix+"    ");
+        }
+        else{
+            console.log(prefix + "├───" + content[i]);
+            if(fs.lstatSync(temp).isDirectory()) tree(temp, prefix+"│   ");
+        }
+        
+    }
 }
