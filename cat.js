@@ -110,6 +110,7 @@ function organize(folderpath) {
         let allFiles = fs.readdirSync(folderpath);
         for (let i = 0; i < allFiles.length; i++){
             let fullPathOfFile = path.join(folderpath, allFiles[i]);
+            if (allFiles[i].substring(allFiles[i].length-11) == "_compressed") moveToDestinationFolder(folderpath, allFiles[i], organisedFile, "Archives");
             let isFile = fs.lstatSync(fullPathOfFile).isFile();
             if (isFile) {
                 let ext = path.extname(allFiles[i]).split(".")[1];
