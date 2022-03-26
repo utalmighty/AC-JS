@@ -7,7 +7,11 @@ option to remove big line break (`-s`)<br>
 option to add line number to non empty lines (`-b`)<br>
 option to add line numbers to all lines (`-n`)<br>
 option to encrypt the file (`-e`) (AES-128 bit)<br>
-option to encrypt the file (`-de`) (AES-128 bit)<br>
+option to decrypt the file (`-de`) (AES-128 bit)<br>
+option to compress the file (`-c`)<br>
+option to decompress the file (`-d`)<br>
+option to create new file the file (`-touch`)<br>
+option to view tree structure of directory (`-tree`)<br>
 
 ## Commands:
 1- `node cat filepath` => displays content of the file in the terminal 🗄<br>
@@ -18,7 +22,7 @@ option to encrypt the file (`-de`) (AES-128 bit)<br>
 6- `node cat -e filepath key` => encrypt file with Military Grade(AES-128) bit encryption 🔒<br>
 7- `node cat -de filepath key` => decrypt file with Military Grade(AES-128) bit encryption 🔓<br>
 8- `node cat -c filepath` => Compresses the text based file using Huffman Coding 🗜<br>
-9- `node cat -d filepath` => decompresses file compressed file 🗄<br>
+9- `node cat -d filepath` => Decompresses file compressed file 🗄<br>
 10- `node cat -touch filepath` => Creates new file/folder at the specified path 🆕<br>
 11- `node cat -tree filepath` => Draws the path tree 🌳<br>
 12- We can mix and match some of the options.
@@ -34,3 +38,4 @@ option to encrypt the file (`-de`) (AES-128 bit)<br>
 7- Can only decompress file which is compressed using this software only.<br>
 8- Touch command can create new folder or files.<br>
 9- filepath in tree command is optional.<br>
+10- As meta file contains characters seperated by comma therefore the comma in the orginal file are ignored.⚠️

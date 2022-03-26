@@ -16,6 +16,7 @@ function getProbabiltyArray(content) {
     const map = new Map();
     for (let i=0; i<content.length; i++) {
         let char = content.charAt(i);
+        if (char == ",") continue;
         if (map.has(char)) {
             map.set(char, map.get(char)+1);
         }
@@ -80,14 +81,14 @@ function getActualData(data, tree) {
     while(indx < data.length) {
         if (data[indx] == 0) { // Go left of tree
             pointer = leftChild(pointer);
-            if(tree[pointer].length == 1) {
+            if(tree[pointer].length > 0) {
                 actualData.push(tree[pointer]);
                 pointer = 1;
             }
         }
         else if (data[indx] == 1) { // Go right
             pointer = rightChild(pointer);
-            if(tree[pointer].length == 1) {
+            if(tree[pointer].length > 0) {
                 actualData.push(tree[pointer]);
                 pointer = 1;
             }
@@ -220,10 +221,11 @@ function compress(file) {
     let final = [];
     for (let i=0; i<content.length; i++) {
         let char = content.charAt(i);
+        if(char == ",") continue; //Skipping Comma
         final.push(binary[char]);
     }
     let binaryString = final.join("");
-    getActualData(binaryString, queue.join(",").split(","));
+    //getActualData(binaryString, queue.join(",").split(","));
     let indx = 0;
     decimalArray = [];
     let length = binaryString.length;
@@ -268,8 +270,14 @@ function decompress(folder) {
     let metaDataFile = fileInArray[2];
     const metaData = fs.readFileSync(metaDataFile, "utf-8");
     let phases = metaData.split("\n");
-    let tree = phases[1].split(",");
-    let extraBits = phases[2];
+    let tree = null;
+    if (phases.length > 3) {
+        tree = (phases[1]+"\n"+phases[2]).split(",");
+    }
+    else{
+        tree = phases[1].split(",");
+    }
+    let extraBits = phases[phases.length-1];
     let data = readBuffer(file);
     let binaryData = [];
     for (let i=0; i<data.length; i++) {
