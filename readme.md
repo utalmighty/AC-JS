@@ -38,4 +38,3 @@ option to view tree structure of directory (`-tree`)<br>
 7- Can only decompress file which is compressed using this software only.<br>
 8- Touch command can create new folder or files.<br>
 9- filepath in tree command is optional.<br>
-10- As meta file contains characters seperated by comma therefore the comma in the orginal file are ignored.⚠️
