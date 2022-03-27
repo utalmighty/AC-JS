@@ -38,3 +38,8 @@ option to view tree structure of directory (`-tree`)<br>
 7- Can only decompress file which is compressed using this software only.<br>
 8- Touch command can create new folder or files.<br>
 9- filepath in tree command is optional.<br>
+
+## Compression:
+### Before Compression: ![Before Compression](https://link)
+`node cat -c Folder/Large.txt`
+### After Compression: ![After Compression](https://link)

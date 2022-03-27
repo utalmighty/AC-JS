@@ -82,7 +82,6 @@ function getActualData(data, tree) {
             pointer = leftChild(pointer);
             if(tree[pointer].length > 0) {
                 if (tree[pointer] == "cma") {
-                    console.log("HERE");
                     actualData.push(",");
                 }
                 else{
