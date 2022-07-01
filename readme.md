@@ -10,7 +10,7 @@ option to encrypt the file (`-e`) (AES-128 bit)<br>
 option to decrypt the file (`-de`) (AES-128 bit)<br>
 option to compress the file (`-c`)<br>
 option to decompress the file (`-d`)<br>
-option to create new file the file (`-touch`)<br>
+option to create new file (`-touch`)<br>
 option to view tree structure of directory (`-tree`)<br>
 
 ## Commands:
