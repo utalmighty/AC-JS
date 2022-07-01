@@ -15,7 +15,7 @@ option to view tree structure of directory (`-tree`)<br>
 
 ## Commands:
 1- `node cat filepath` => displays content of the file in the terminal 🗄<br>
-2- `node cat filepath1 filepath2 filepath3...` => displays content of all files in the terminal in (contactinated form) in the given order. 🗃<br>
+2- `node cat filepath1 filepath2 filepath3...` => displays content of all files in the terminal in (concatenated form) in the given order. 🗃<br>
 3- `node cat -s filepath` => convert big line breaks into a singular line break 📜<br>
 4- `node cat -n filepath` => give numbering to all the lines 🔢<br>
 5- `node cat -b filepath` => give numbering to non-empty lines 📜🔢<br>
