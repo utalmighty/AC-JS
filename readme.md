@@ -18,7 +18,7 @@ option to view tree structure of directory (`-tree`)<br>
 2- `node cat filepath1 filepath2 filepath3...` => displays content of all files in the terminal in (concatenated form) in the given order. 🗃<br>
 3- `node cat -s filepath` => convert big line breaks into a singular line break 📜<br>
 4- `node cat -n filepath` => give numbering to all the lines 🔢<br>
-5- `node cat -b filepath` => give numbering to non-empty lines 📜🔢<br>
+5- `node cat -b filepath` => give numbering to non-empty lines 🔢📜<br>
 6- `node cat -e filepath key` => encrypt file with Military Grade(AES-128) bit encryption 🔒<br>
 7- `node cat -de filepath key` => decrypt file with Military Grade(AES-128) bit encryption 🔓<br>
 8- `node cat -c filepath` => Compresses the text based file using Huffman Coding 🗜<br>
