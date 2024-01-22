@@ -1,4 +1,6 @@
 # Advance CAT commands
+## Installation💻
+`npm install`
 
 ## General Syntax:
 `node cat [options] [filepaths] [key]`
