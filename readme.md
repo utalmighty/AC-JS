@@ -42,6 +42,6 @@ option to view tree structure of directory (`-tree`)<br>
 9- filepath in tree command is optional.<br>
 
 ## Compression:
-### Before Compression: ![Before Compression](https://github.com/utalmighty/AC-JS/blob/main/Folder2/Organised_Files/Images/Before.png?raw=true)
+### Before Compression: ![Before Compression](https://raw.githubusercontent.com/utalmighty/AC-JS/46601da42cc73a0f11ef785ba7ab6bbfe5ae7ac1/Folder2/Organised_Files/Images/Before.png)
 `node cat -c Folder/Large.txt`
-### After Compression: ![After Compression](https://github.com/utalmighty/AC-JS/blob/main/Folder2/Organised_Files/Images/After.png?raw=true)
+### After Compression: ![After Compression](https://raw.githubusercontent.com/utalmighty/AC-JS/46601da42cc73a0f11ef785ba7ab6bbfe5ae7ac1/Folder2/Organised_Files/Images/After.png)
