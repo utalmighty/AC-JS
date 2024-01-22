@@ -16,17 +16,17 @@ option to create new file (`-touch`)<br>
 option to view tree structure of directory (`-tree`)<br>
 
 ## Commands:
-1- `node cat filepath` => displays content of the file in the terminal 🗄<br>
-2- `node cat filepath1 filepath2 filepath3...` => displays content of all files in the terminal in (concatenated form) in the given order. 🗃<br>
-3- `node cat -s filepath` => convert big line breaks into a singular line break 📜<br>
-4- `node cat -n filepath` => give numbering to all the lines 🔢<br>
-5- `node cat -b filepath` => give numbering to non-empty lines 🔢📜<br>
-6- `node cat -e filepath key` => encrypt file with Military Grade(AES-128) bit encryption 🔒<br>
-7- `node cat -de filepath key` => decrypt file with Military Grade(AES-128) bit encryption 🔓<br>
-8- `node cat -c filepath` => Compresses the text based file using Huffman Coding 🗜<br>
-9- `node cat -d filepath` => Decompresses file compressed file 🗄<br>
-10- `node cat -touch filepath` => Creates new file/folder at the specified path 🆕<br>
-11- `node cat -tree filepath` => Draws the path tree 🌳<br>
+1- `node cat <filepath>` => displays content of the file in the terminal 🗄<br>
+2- `node cat <filepath1 filepath2 filepath3...>` => displays content of all files in the terminal in (concatenated form) in the given order. 🗃<br>
+3- `node cat -s <filepath>` => convert big line breaks into a singular line break 📜<br>
+4- `node cat -n <filepath>` => give numbering to all the lines 🔢<br>
+5- `node cat -b <filepath>` => give numbering to non-empty lines 🔢📜<br>
+6- `node cat -e <filepath> <key>` => encrypt file with Military Grade(AES-128) bit encryption 🔒<br>
+7- `node cat -de <filepath> <key>` => decrypt file with Military Grade(AES-128) bit encryption 🔓<br>
+8- `node cat -c <filepath>` => Compresses the text based file using Huffman Coding 🗜<br>
+9- `node cat -d <filepath>` => Decompresses file compressed file 🗄<br>
+10- `node cat -touch <filepath>` => Creates new file/folder at the specified path 🆕<br>
+11- `node cat -tree <filepath>` => Draws the path tree 🌳<br>
 12- We can mix and match some of the options.
 
 ## Edge cases:
@@ -43,5 +43,4 @@ option to view tree structure of directory (`-tree`)<br>
 
 ## Compression:
 ### Before Compression: ![Before Compression](https://raw.githubusercontent.com/utalmighty/AC-JS/46601da42cc73a0f11ef785ba7ab6bbfe5ae7ac1/Folder2/Organised_Files/Images/Before.png)
-`node cat -c Folder/Large.txt`
 ### After Compression: ![After Compression](https://raw.githubusercontent.com/utalmighty/AC-JS/46601da42cc73a0f11ef785ba7ab6bbfe5ae7ac1/Folder2/Organised_Files/Images/After.png)
