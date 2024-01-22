@@ -1,5 +1,5 @@
 
-const DataNode = require('./DataNode.js')
+const DataNode = require('./DataNode')
 
 class MinHeap {
 

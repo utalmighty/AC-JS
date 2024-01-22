@@ -1,8 +1,8 @@
 const fs = require("fs");
 const path = require("path"); //path module
 var sha256 = require('js-sha256');
-const AES = require('./AES.js');
-let compression = require("./compression");
+const AES = require('./modules/AES');
+let compression = require("./modules/compression");
 
 //Command Syntax: node cat.js [option] [filepath] "[key]" //key is for encryption/decryption
 // OPTIONS

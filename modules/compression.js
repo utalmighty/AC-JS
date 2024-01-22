@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const MinHeap = require('./MinHeap.js');
+const MinHeap = require('./MinHeap');
 
 //TODO: multiple line unsuppored right now/support it
 
