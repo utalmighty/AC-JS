@@ -334,10 +334,11 @@ function encryDecry(options, file, key) {
     }
     let obj = new AES(key);
     let hash = sha256.sha256(key);
-    let filecontent = fs.readFileSync(file, "utf-8");
+    let filecontent = null;
     let indx = 0;
 
     if(options[0] == "-de") {
+        filecontent = fs.readFileSync(file, "utf-8");
         let index = 0;
         while(filecontent[index] != "\n" && index<filecontent.length) index++;
         let keydigest = filecontent.substring(0, index+1);
@@ -354,6 +355,9 @@ function encryDecry(options, file, key) {
             console.log("Unable to authenticate the key");
             return;
         }
+    }
+    else {
+        filecontent = fs.readFileSync(file, "hex");
     }
 
     let finalmessage = "";
@@ -377,15 +381,17 @@ function encryDecry(options, file, key) {
 
     if(options[0] == "-e") {
         finalmessage = '{"keydigest":"'+hash+'"}\n'+finalmessage;
+        fs.writeFileSync(file, finalmessage.substring(0, finalmessage.length));
     }
-    last = finalmessage.length;
+    
     if(options[0] == "-de") {
-        
+        last = finalmessage.length;
         while(finalmessage.charCodeAt(last-1) == 0){
             last--;
         }
+        fs.writeFileSync(file, finalmessage.substring(0, last), "hex");
     }
-    fs.writeFileSync(file, finalmessage.substring(0, last));
+ 
 }
 
 function decompressFolderBriefValidation(folder) {
