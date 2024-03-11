@@ -31,7 +31,7 @@ option to view tree structure of directory (`-tree`)<br>
 
 ## Edge cases:
 
-1- If file entered is not found then it gives file does not exist error.<br>
+1- If file entered is not found then it gives file does not exist error.❌<br>
 2- `-n` and `-b` are 2 options which are mutually exclusive so if user types both of them together only the first enter option should work.<br>
 3- `-s` and any or both `-n` and `-b` present then `-s` will be executed first and then `-n` and `-b` according second rule.<br>
 4- Advanced options like encryption/decryption can not be mixed matched.<br>
